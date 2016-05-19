@@ -83,7 +83,7 @@ public class Capabilities {
 
 	    public static class Default implements IAlignment{
 	        private boolean hasAlignment = false;
-	        private String AlignmentType = null;
+	        private String AlignmentType = "good";
 
 			@Override
 			public boolean hasAlignment() {

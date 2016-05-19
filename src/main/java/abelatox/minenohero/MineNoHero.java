@@ -1,22 +1,17 @@
 package abelatox.minenohero;
 
+import abelatox.minenohero.entities.bad.BadMob;
+import abelatox.minenohero.entities.good.GoodMob;
 import abelatox.minenohero.network.AlignmentSync;
 import abelatox.minenohero.network.PacketDispatcher;
 import abelatox.minenohero.proxies.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -72,32 +67,23 @@ public class MineNoHero {
         }
     }
 
-    @SubscribeEvent
+   /* @SubscribeEvent
     public void death(LivingDropsEvent event) {
         if (!event.getEntity().worldObj.isRemote) {
             if (event.getEntity() instanceof EntityPlayer) {
-                if (event.getEntity().getCapability(Kiznaivers.KIZNAIVERS, null).hasImplant()) {
+                if (event.getEntity().getCapability(Capabilities.ALIGNMENT, null).hasImplant()) {
                     event.getDrops().add(new EntityItem(event.getEntity().worldObj, event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ, new ItemStack(kiznaiverImplant)));
                 }
             }
         }
-    }
+    }*/
 
     @SubscribeEvent
     public void clone(PlayerEvent.Clone event) {
         System.out.println("Clone");
-        if (event.isWasDeath()) {
-                EntityPlayer oldplayer = event.getOriginal().getServer().getPlayerList().getPlayerByUsername(event.getOriginal().getCapability(Capabilities.ALIGNMENT, null).getKiznaivers().get(i));
-                if (kiznaiver != null) {
-                    kiznaiver.addChatComponentMessage(new TextComponentString("You're no longer bound by " + event.getOriginal().getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().get(i) + "'s wounds"));
-                    if (kiznaiver.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().contains(event.getOriginal().getDisplayNameString()))
-                        kiznaiver.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().remove(kiznaiver.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().indexOf(event.getOriginal().getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().get(i)));
-                }
-            }
-        }
     }
 
-    @SubscribeEvent
+  /*  @SubscribeEvent
     public void interact(PlayerInteractEvent.EntityInteract event) {
         if (event.getHand().equals(EnumHand.MAIN_HAND)) {
             if (!event.getWorld().isRemote) {
@@ -122,30 +108,17 @@ public class MineNoHero {
                 }
             }
         }
-    }
+    }*/
 
     @SubscribeEvent
-    public void onEntityHurt(LivingHurtEvent event) {
-        DamageSource kiznaiverDamage = new KiznaiverDamage("kizunacraft.kiznaiverDamage", event.getSource().getSourceOfDamage());
-        if (event.getSource().getDamageType() != kiznaiverDamage.getDamageType()) {
-            if (!event.getEntity().worldObj.isRemote) {
-                if (event.getEntity() instanceof EntityPlayer) {
-                    EntityPlayer player = (EntityPlayer) event.getEntity();
-                    PacketDispatcher.sendTo(new KiznaiverSync(player.getCapability(Kiznaivers.KIZNAIVERS, null)), (EntityPlayerMP) player);
-                    if (!player.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().isEmpty()) {
-                        int count = player.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().size();
-                        for (int i = 0; i < player.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().size(); i++) {
-                            EntityPlayer kiznaiver = player.getServer().getPlayerList().getPlayerByUsername(player.getCapability(Kiznaivers.KIZNAIVERS, null).getKiznaivers().get(i));
-                            if (kiznaiver == null)
-                                count -= 1;
-                            else
-                                kiznaiver.attackEntityFrom(kiznaiverDamage, event.getAmount() / (count + 1));
-                        }
-                        if (count > 0)
-                            event.setAmount(event.getAmount() / (count + 1));
-                    }
-                }
-            }
+    public void onEntityDead(LivingDeathEvent event) {
+        if(event.getEntity() instanceof GoodMob)
+        {
+        	// Add points
+        }
+        else if(event.getEntity() instanceof BadMob)
+        {
+        	//Substract points
         }
     }
 }
